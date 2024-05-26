@@ -14,13 +14,16 @@ import javax.swing.JOptionPane;
  *
  * @author User
  */
+
+//java.lang.NullPointerException: Cannot invoke "String.equals(Object)" because the return value of "login.getUsername()" is null
+
 public class login extends javax.swing.JFrame {
     
     String url = "jdbc:mysql://localhost:3306/Airline";
     String user = "root";
     String databasepassword = "";
     
-    
+    private String username, password;
     public login() {
         initComponents();
         fPassword.setText("<html><u>Forgot Password</u></html>");
@@ -45,13 +48,14 @@ public class login extends javax.swing.JFrame {
         tPassword = new javax.swing.JPasswordField();
         tUsername = new javax.swing.JTextField();
         fPassword = new javax.swing.JLabel();
+        checkbox = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
         jReg = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
-        setUndecorated(true);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(51, 51, 255,80));
@@ -110,7 +114,7 @@ public class login extends javax.swing.JFrame {
         jPanel2.add(tPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 150, 244, 40));
 
         tUsername.setBackground(new java.awt.Color(255, 255, 255,0));
-        tUsername.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        tUsername.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         tUsername.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tUsername.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 51, 255), 3, true));
         jPanel2.add(tUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 80, 244, 38));
@@ -118,7 +122,23 @@ public class login extends javax.swing.JFrame {
         fPassword.setFont(new java.awt.Font("Thibus29STru", 1, 18)); // NOI18N
         fPassword.setForeground(new java.awt.Color(0, 0, 0));
         fPassword.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jPanel2.add(fPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 190, 290, 40));
+        fPassword.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        fPassword.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                fPasswordMouseClicked(evt);
+            }
+        });
+        jPanel2.add(fPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 190, 270, 40));
+
+        checkbox.setFont(new java.awt.Font("Thibus29STru", 1, 14)); // NOI18N
+        checkbox.setForeground(new java.awt.Color(0, 0, 0));
+        checkbox.setText("Show Password");
+        checkbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxActionPerformed(evt);
+            }
+        });
+        jPanel2.add(checkbox, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 190, -1, -1));
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 190, 540, 310));
 
@@ -128,7 +148,7 @@ public class login extends javax.swing.JFrame {
 
         jReg.setFont(new java.awt.Font("Thibus29STru", 1, 14)); // NOI18N
         jReg.setForeground(new java.awt.Color(0, 0, 0));
-        jReg.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jReg.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jReg.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jReg.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -141,7 +161,7 @@ public class login extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/image.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 770, 530));
 
-        setSize(new java.awt.Dimension(769, 511));
+        setSize(new java.awt.Dimension(785, 548));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -149,22 +169,38 @@ public class login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tPasswordActionPerformed
 
+    public void setDetails(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+    
+    public String getUsername(){
+        return this.username;
+    }
+    
+    public String getPassword(){
+        return this.password;
+    }
+    
+    
+    
     private void jRegMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRegMouseClicked
         // TODO add your handling code here:
-        UserRegister reg = new UserRegister();
+        Register reg = new Register();
         reg.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jRegMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-      /* 
-        String username = tUsername.getText();
-        String password = tPassword.getText();
+    
+        String tusername = tUsername.getText();
+        String tpassword = tPassword.getText();
         
         
        
-          String query = "SELECT * FROM users";
+          String query = "SELECT username,password FROM users where username = '"+tusername+"' and password = '"+tpassword+"' ";
+          
     
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -173,28 +209,20 @@ public class login extends javax.swing.JFrame {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(query);
 
-            while(result.next()) { // Check if there's a matching record
-                String Dusername = result.getString(3);
-                String Dpassword = result.getString(4);
-                
-               
             
-                if(Dusername.equals(username) && Dpassword.equals(password)){
-                    JOptionPane.showMessageDialog(rootPane, "Welcome to Sri Lankan Airline Booking System");
+            String Dusername ,Dpassword;
+            if(result.next()) { // Check if there's a matching record
+                JOptionPane.showMessageDialog(rootPane, "Welcome to Sri Lankan Airline Booking System");
                     Mainmenu mainmenu = new Mainmenu();
                     mainmenu.setVisible(true);
                     this.dispose();
-                    break;
-               
-                }
-                else{
-                    JOptionPane.showMessageDialog(rootPane, "Username and password is not matched.");
-                    break;
-                }
-                
-                
             }
-
+            
+            else{
+                JOptionPane.showMessageDialog(rootPane, "Username and password is not match..Try again");
+            }
+            
+              
             connection.close();
         
  
@@ -203,16 +231,13 @@ public class login extends javax.swing.JFrame {
        
         }
         
-        */
         
-        
+        /*
         
          Mainmenu mainmenu = new Mainmenu();
         mainmenu.setVisible(true);
         this.dispose();
-
-        
-        
+        */
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -223,6 +248,24 @@ public class login extends javax.swing.JFrame {
          }
         
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void fPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fPasswordMouseClicked
+        // TODO add your handling code here:
+        ForgotPassword password = new ForgotPassword();
+        password.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_fPasswordMouseClicked
+
+    private void checkboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxActionPerformed
+        // TODO add your handling code here:
+
+        if(checkbox.isSelected()){
+            tPassword.setEchoChar((char)0);
+        }
+        else{
+            tPassword.setEchoChar('*');
+        }
+    }//GEN-LAST:event_checkboxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -260,6 +303,7 @@ public class login extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox checkbox;
     private javax.swing.JLabel fPassword;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
